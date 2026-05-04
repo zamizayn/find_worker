@@ -4,7 +4,7 @@ const { User, Profile } = require('../../models');
 
 exports.register = async (req, res) => {
   try {
-    const { email, password, firstName, lastName } = req.body;
+    const { email, password, firstName, lastName, role } = req.body;
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -12,7 +12,11 @@ exports.register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ email, password: hashedPassword });
+    const user = await User.create({ 
+      email, 
+      password: hashedPassword,
+      role: role || 1 // Default to 1 (CANDIDATE)
+    });
 
     await Profile.create({
       userId: user.id,
@@ -21,8 +25,15 @@ exports.register = async (req, res) => {
     });
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-
-    res.status(201).json({ token, user: { id: user.id, email: user.email } });
+ 
+    res.status(201).json({ 
+      token, 
+      user: { 
+        id: user.id, 
+        email: user.email,
+        role: user.role
+      } 
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -44,7 +55,14 @@ exports.login = async (req, res) => {
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
-    res.json({ token, user: { id: user.id, email: user.email } });
+    res.json({ 
+      token, 
+      user: { 
+        id: user.id, 
+        email: user.email,
+        role: user.role
+      } 
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

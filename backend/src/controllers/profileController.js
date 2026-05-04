@@ -47,3 +47,20 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getCandidates = async (req, res) => {
+  try {
+    const candidates = await User.findAll({
+      where: { role: 1 }, // 1 is CANDIDATE
+      attributes: ['id', 'email', 'role'],
+      include: [{ 
+        model: Profile, 
+        as: 'profile',
+        attributes: ['firstName', 'lastName', 'headline', 'bio', 'location', 'avatarUrl'] 
+      }]
+    });
+    res.json(candidates);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
