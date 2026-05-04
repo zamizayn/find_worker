@@ -11,6 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       User.hasOne(models.Profile, { foreignKey: 'userId', as: 'profile' });
+      User.hasMany(models.Job, { foreignKey: 'authorId', as: 'jobs' });
+      User.hasMany(models.Application, { foreignKey: 'userId', as: 'applications' });
+      User.hasMany(models.Message, { foreignKey: 'senderId', as: 'sentMessages' });
+      User.hasMany(models.Message, { foreignKey: 'receiverId', as: 'receivedMessages' });
+      User.hasMany(models.Notification, { foreignKey: 'userId', as: 'notifications' });
+      User.hasMany(models.Post, { foreignKey: 'authorId', as: 'posts' });
     }
   }
   User.init({
